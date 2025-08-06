@@ -1,0 +1,748 @@
+Entendi. O link para visualização do extrato no Issuu não está funcionando corretamente dentro do iframe. Vou corrigir isso substituindo o iframe por um link direto e funcional, além de incluir os dados financeiros mais importantes diretamente no site para garantir que a informação principal esteja sempre acessível.
+
+Aqui está o HTML completo e funcional com a correção:
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Investigação: Caso Everson Cristian da Silva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #cbd5e1;
+        }
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        #investigation-interface {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .section-title {
+            font-weight: 900;
+            font-size: 2.5rem;
+            line-height: 1.1;
+            color: #f1f5f9;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+        }
+        .kpi-card {
+            background-color: #1e293b;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            border: 1px solid #334155;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .kpi-value {
+            font-weight: 700;
+            font-size: 3rem;
+            line-height: 1;
+        }
+        .kpi-label {
+            font-weight: 500;
+            color: #94a3b8;
+            margin-top: 0.75rem;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 3rem;
+            padding-left: 3rem;
+            border-left: 2px dashed #475569;
+        }
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+            padding-bottom: 0;
+        }
+        .timeline-icon {
+            position: absolute;
+            left: -1.25rem;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            background-color: #facc15;
+            color: #1e293b;
+            font-weight: 700;
+            border: 4px solid #1e293b;
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.5);
+        }
+        .case-file-tab.active {
+            background-color: #facc15;
+            color: #1e293b;
+            border-color: #facc15;
+        }
+        .case-file-tab:not(.active) {
+            background-color: transparent;
+            color: #94a3b8;
+            border-color: #475569;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .animated-element {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animated-element.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .stamp {
+            border: 5px solid #dc2626;
+            color: #dc2626;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transform: rotate(-10deg);
+            display: inline-block;
+            opacity: 0.8;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .data-table th {
+            background-color: #334155;
+            color: #f1f5f9;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+        }
+        .data-table td {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid #334155;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #1e293b;
+        }
+        .data-table tr:nth-child(odd) {
+            background-color: #0f172a;
+        }
+        .nav-menu {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background-color: #0f172a;
+            border-bottom: 1px solid #334155;
+            padding: 1rem 0;
+        }
+        .nav-menu ul {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .nav-menu a {
+            display: block;
+            padding: 0.5rem 1rem;
+            background-color: #1e293b;
+            color: #94a3b8;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background-color: #334155;
+            color: #f1f5f9;
+        }
+        .nav-menu a.active {
+            background-color: #facc15;
+            color: #1e293b;
+        }
+        @media (max-width: 768px) {
+            .nav-menu ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            .nav-menu a {
+                width: 90%;
+                text-align: center;
+            }
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="splash-screen" class="min-h-screen flex flex-col items-center justify-center text-center p-4 transition-opacity duration-1000">
+        <div class="max-w-3xl">
+            <h1 class="text-4xl md:text-6xl font-black text-slate-100 mb-4">Portal de Investigação Forense</h1>
+            <p class="text-lg md:text-xl text-slate-400 mb-2 font-mono">CASO Nº: TSE-SP-2024-NAT-001</p>
+            <p class="text-lg md:text-xl text-slate-300 mb-8">Assunto: Análise de Contas de Campanha - Everson Cristian da Silva (PL)</p>
+            <button id="start-investigation-btn" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-xl py-4 px-10 rounded-lg shadow-lg shadow-amber-500/20 transition-all duration-300 transform hover:scale-105">
+                Iniciar Investigação
+            </button>
+        </div>
+    </div>
+    <div id="investigation-interface">
+        <nav class="nav-menu animated-element">
+            <ul>
+                <li><a href="#crime" class="nav-link">Crime</a></li>
+                <li><a href="#timeline" class="nav-link">Linha do Tempo</a></li>
+                <li><a href="#suspects" class="nav-link">Fornecedores</a></li>
+                <li><a href="#legal" class="nav-link">Enquadramento Legal</a></li>
+                <li><a href="#data" class="nav-link">Dados Financeiros</a></li>
+                <li><a href="#conclusion" class="nav-link">Conclusão</a></li>
+            </ul>
+        </nav>
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <header class="py-4 mb-16 animated-element">
+                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                    <h2 class="font-mono text-lg text-slate-200">ARQUIVO DO CASO: <span class="text-amber-400">ECSILVA-FEFC-2024</span></h2>
+                    <div class="font-mono text-lg text-red-400">STATUS: <span class="font-bold">FRAUDE EVIDENTE</span></div>
+                </div>
+            </header>
+            <section id="crime" class="mb-24 text-center animated-element">
+                <h2 class="section-title mb-4">A Irregularidade Central</h2>
+                <p class="text-lg text-slate-400 max-w-3xl mx-auto mb-12">A investigação foca em uma discrepância fundamental: o dinheiro público recebido versus o dinheiro declarado como gasto. Os números abaixo formam a base desta análise.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="kpi-card animated-element" style="transition-delay: 0.1s;">
+                        <div id="kpi-recebido" class="kpi-value text-green-400">R$ 0</div>
+                        <div class="kpi-label">VERBA PÚBLICA (FEFC) RECEBIDA</div>
+                    </div>
+                    <div class="kpi-card animated-element" style="transition-delay: 0.2s;">
+                        <div id="kpi-gasto" class="kpi-value text-amber-400">R$ 0</div>
+                        <div class="kpi-label">DESPESA REAL (COMPROVADA)</div>
+                    </div>
+                    <div class="kpi-card animated-element" style="transition-delay: 0.3s;">
+                        <div id="kpi-declarado" class="kpi-value text-red-500">R$ 0,00</div>
+                        <div class="kpi-label">DESPESA DECLARADA AO TSE</div>
+                    </div>
+                </div>
+            </section>
+            <section id="timeline" class="mb-24 animated-element">
+                <h2 class="section-title text-center mb-12">Linha do Tempo: A Construção da Fraude</h2>
+                <p class="text-lg text-center text-slate-400 max-w-3xl mx-auto mb-16">A cronologia dos eventos revela que a omissão foi um ato deliberado, não um erro. Acompanhe como os fatos se desenrolaram, demonstrando a intenção de ocultar as despesas.</p>
+                <div class="max-w-3xl mx-auto">
+                    <div class="timeline-item animated-element">
+                        <div class="timeline-icon">1</div>
+                        <p class="font-mono text-amber-400">13/09/2024</p>
+                        <h4 class="text-2xl font-bold text-slate-100 mt-1">Entrada dos Recursos</h4>
+                        <p class="text-slate-300 mt-2">A campanha recebe <strong class="text-green-400">R$ 12.000,00</strong> do Fundo Eleitoral (FEFC), via Direção Nacional do PL. O dinheiro público está na conta.</p>
+                    </div>
+                    <div class="timeline-item animated-element">
+                        <div class="timeline-icon">2</div>
+                        <p class="font-mono text-amber-400">16/09/2024</p>
+                        <h4 class="text-2xl font-bold text-slate-100 mt-1">Primeira Declaração Falsa</h4>
+                        <p class="text-slate-300 mt-2">No relatório parcial ao TRE, o candidato declara o recebimento dos R$ 12.000,00, mas informa <strong class="text-red-500">R$ 0,00 em despesas</strong>.</p>
+                    </div>
+                    <div class="timeline-item animated-element">
+                        <div class="timeline-icon">3</div>
+                        <p class="font-mono text-amber-400">17-27/09/2024</p>
+                        <h4 class="text-2xl font-bold text-slate-100 mt-1">Execução dos Pagamentos</h4>
+                        <p class="text-slate-300 mt-2">A totalidade dos <strong class="text-amber-400">R$ 12.000,00</strong> é paga a dois fornecedores via transferência bancária, liquidando todos os recursos.</p>
+                    </div>
+                    <div class="timeline-item animated-element">
+                        <div class="timeline-icon">4</div>
+                        <p class="font-mono text-amber-400">26/10/2024</p>
+                        <h4 class="text-2xl font-bold text-slate-100 mt-1">Consolidação da Fraude</h4>
+                        <p class="text-slate-300 mt-2">Na prestação de contas final, um mês após gastar todo o dinheiro, o candidato <strong class="text-red-500">mantém a declaração de despesas zeradas</strong>. A omissão deliberada é confirmada.</p>
+                    </div>
+                </div>
+            </section>
+            <section id="suspects" class="mb-24 animated-element">
+                <h2 class="section-title text-center mb-12">Dossiê: Análise dos Fornecedores</h2>
+                <p class="text-lg text-center text-slate-400 max-w-3xl mx-auto mb-16">O destino do dinheiro é um ponto-chave da investigação. 90% dos recursos foram para uma única empresa com múltiplos sinais de ser uma fachada. Selecione o arquivo para ver os detalhes.</p>
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex border-b border-slate-700 mb-6">
+                        <button class="case-file-tab active font-mono py-3 px-6 text-lg border-b-4 transition" data-tab="fornecedor1">ARQUIVO: MEGA VALE ADM. [90%]</button>
+                        <button class="case-file-tab font-mono py-3 px-6 text-lg border-b-4 transition" data-tab="fornecedor2">ARQUIVO: M. I. SOUSA [10%]</button>
+                    </div>
+                    <div id="fornecedor1" class="tab-content active animated-element">
+                        <div class="bg-slate-800 p-8 rounded-lg border border-slate-700">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 class="text-2xl font-bold text-slate-100">MEGA VALE ADMINISTRADORA...</h3>
+                                    <p class="font-mono text-slate-400">CNPJ: 50.149.836/0001-20 | VALOR: R$ 10.800,00</p>
+                                </div>
+                                <div class="stamp">SUSPEITO</div>
+                            </div>
+                            <ul class="space-y-4">
+                                <li class="flex items-start p-3 bg-slate-900/50 rounded"><span class="mr-4 text-amber-400 text-2xl">🚨</span><div><strong class="text-slate-200">INDÍCIO 1: EMPRESA DE FACHADA.</strong> Atividades econômicas (CNAEs) totalmente desconexas: de publicidade a instalação elétrica e comércio varejista. Padrão clássico de empresa criada para emitir notas fiscais para qualquer tipo de serviço fraudulento.</div></li>
+                                <li class="flex items-start p-3 bg-slate-900/50 rounded"><span class="mr-4 text-amber-400 text-2xl">🚨</span><div><strong class="text-slate-200">INDÍCIO 2: CRIAÇÃO RECENTE.</strong> Fundada em Março de 2023, sem histórico de mercado, mas recebeu 90% da verba da campanha.</div></li>
+                                <li class="flex items-start p-3 bg-slate-900/50 rounded"><span class="mr-4 text-amber-400 text-2xl">🚨</span><div><strong class="text-slate-200">INDÍCIO 3: NOME PARASITÁRIO.</strong> Usa nome similar a uma grande empresa legítima ("Mega Vale Card") para gerar confusão e aparentar credibilidade.</div></li>
+                                <li class="flex items-start p-3 bg-slate-900/50 rounded"><span class="mr-4 text-amber-400 text-2xl">🚨</span><div><strong class="text-slate-200">INDÍCIO 4: SEM PROVAS DO SERVIÇO.</strong> Justificativa de gasto como "Diversas a especificar" e ausência total de notas fiscais. Impossível verificar o que foi (ou se foi) entregue.</div></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="fornecedor2" class="tab-content animated-element">
+                         <div class="bg-slate-800 p-8 rounded-lg border border-slate-700">
+                            <h3 class="text-2xl font-bold text-slate-100">MARIA INEZ DA SILVA SOUSA</h3>
+                            <p class="font-mono text-slate-400 mb-6">CPF: 209.993.***-84 | VALOR: R$ 1.200,00</p>
+                            <ul class="space-y-4">
+                                <li class="flex items-start p-3 bg-slate-900/50 rounded"><span class="mr-4 text-amber-400 text-2xl">⚠️</span><div><strong class="text-slate-200">IRREGULARIDADE: GASTO SEM COMPROVAÇÃO.</strong> Pagamento por "militância de rua" sem contrato, sem descrição de atividades, horários ou locais, e sem nota fiscal. Violação direta do Art. 35 da Res. TSE 23.607/19.</div></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="legal" class="mb-24 animated-element">
+                <h2 class="section-title text-center mb-12">Enquadramento Legal: As Consequências</h2>
+                <p class="text-lg text-center text-slate-400 max-w-3xl mx-auto mb-16">As ações do candidato não são apenas falhas, são violações diretas da lei. Cada irregularidade tem uma consequência jurídica específica. Expanda os artigos para entender as sanções.</p>
+                <div class="max-w-4xl mx-auto space-y-3" id="accordion-container">
+                </div>
+            </section>
+            <section id="data" class="mb-24 animated-element">
+                <h2 class="section-title text-center mb-12">Dados Financeiros Detalhados</h2>
+                <p class="text-lg text-center text-slate-400 max-w-3xl mx-auto mb-16">Abaixo estão os dados detalhados das despesas, receitas e transferências bancárias da campanha, extraídos diretamente dos documentos oficiais.</p>
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex border-b border-slate-700 mb-6">
+                        <button class="case-file-tab active font-mono py-3 px-6 text-lg border-b-4 transition" data-tab="despesas-tipo">DESPESAS POR TIPO</button>
+                        <button class="case-file-tab font-mono py-3 px-6 text-lg border-b-4 transition" data-tab="despesas-credor">DESPESAS POR CREDOR</button>
+                        <button class="case-file-tab font-mono py-3 px-6 text-lg border-b-4 transition" data-tab="receitas">RECEITAS</button>
+                        <button class="case-file-tab font-mono py-3 px-6 text-lg border-b-4 transition" data-tab="transferencias">TRANSFERÊNCIAS BANCÁRIAS</button>
+                        <button class="case-file-tab font-mono py-3 px-6 text-lg border-b-4 transition" data-tab="extrato-pdf">EXTRATO PDF</button>
+                    </div>
+                    <div id="despesas-tipo" class="tab-content active animated-element">
+                        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                            <h3 class="text-xl font-bold text-slate-100 mb-4">Despesas por Tipo</h3>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Quantidade</th>
+                                            <th>Valor (R$)</th>
+                                            <th>Percentual (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Diversas a especificar</td>
+                                            <td>1</td>
+                                            <td>5.500,00</td>
+                                            <td>45,83%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Publicidade por materiais impressos</td>
+                                            <td>3</td>
+                                            <td>5.300,00</td>
+                                            <td>44,17%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Atividades de militância e mobilização de rua</td>
+                                            <td>1</td>
+                                            <td>1.200,00</td>
+                                            <td>10,00%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="despesas-credor" class="tab-content animated-element">
+                        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                            <h3 class="text-xl font-bold text-slate-100 mb-4">Despesas por Credor</h3>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>CPF/CNPJ Fornecedor</th>
+                                            <th>Nome do Fornecedor</th>
+                                            <th>Data</th>
+                                            <th>Espécie do Recurso</th>
+                                            <th>Número do Documento</th>
+                                            <th>Valor (R$)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>50.149.836/0001-20</td>
+                                            <td>MEGA VALE ADMINISTRADORA E PRESTACAO DE SERVICOS LTDA</td>
+                                            <td>17/09/2024</td>
+                                            <td>Financeiro</td>
+                                            <td>213</td>
+                                            <td>5.500,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>50.149.836/0001-20</td>
+                                            <td>MEGA VALE ADMINISTRADORA E PRESTACAO DE SERVICOS LTDA</td>
+                                            <td>17/09/2024</td>
+                                            <td>Financeiro</td>
+                                            <td>214</td>
+                                            <td>2.700,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>50.149.836/0001-20</td>
+                                            <td>MEGA VALE ADMINISTRADORA E PRESTACAO DE SERVICOS LTDA</td>
+                                            <td>17/09/2024</td>
+                                            <td>Financeiro</td>
+                                            <td>214</td>
+                                            <td>1.100,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>50.149.836/0001-20</td>
+                                            <td>MEGA VALE ADMINISTRADORA E PRESTACAO DE SERVICOS LTDA</td>
+                                            <td>17/09/2024</td>
+                                            <td>Financeiro</td>
+                                            <td>214</td>
+                                            <td>1.500,00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>209.932.558-84</td>
+                                            <td>MARIA INEZ DA SILVA SOUSA</td>
+                                            <td>17/09/2024</td>
+                                            <td>Financeiro</td>
+                                            <td>SN</td>
+                                            <td>1.200,00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="receitas" class="tab-content animated-element">
+                        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                            <h3 class="text-xl font-bold text-slate-100 mb-4">Doações/Receitas</h3>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Código Receita</th>
+                                            <th>CPF/CNPJ Doador</th>
+                                            <th>Nome do Doador</th>
+                                            <th>Data</th>
+                                            <th>Espécie Recurso</th>
+                                            <th>Número do Documento</th>
+                                            <th>Recibo Eleitoral</th>
+                                            <th>Valor (R$)</th>
+                                            <th>Fonte</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>42783580</td>
+                                            <td>08.517.423/0001-95</td>
+                                            <td>Direção Nacional - Partido Liberal</td>
+                                            <td>13/09/2024</td>
+                                            <td>Transferência eletrônica</td>
+                                            <td>60101</td>
+                                            <td>225801367474SP000002E</td>
+                                            <td>9.000,00</td>
+                                            <td>Fundo Especial</td>
+                                        </tr>
+                                        <tr>
+                                            <td>42783579</td>
+                                            <td>08.517.423/0001-95</td>
+                                            <td>Direção Nacional - Partido Liberal</td>
+                                            <td>13/09/2024</td>
+                                            <td>Transferência eletrônica</td>
+                                            <td>60100</td>
+                                            <td>225801367474SP000001E</td>
+                                            <td>3.000,00</td>
+                                            <td>Fundo Especial</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="transferencias" class="tab-content animated-element">
+                        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                            <h3 class="text-xl font-bold text-slate-100 mb-4">Transferências Bancárias</h3>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Histórico</th>
+                                            <th>Operação</th>
+                                            <th>Número Documento</th>
+                                            <th>Nome Contraparte</th>
+                                            <th>CPF/CNPJ Contraparte</th>
+                                            <th>Valor (R$)</th>
+                                            <th>Nome do Banco</th>
+                                            <th>Agência</th>
+                                            <th>Conta</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>13/09/2024</td>
+                                            <td>CREDITO CFE. INSTRUCOES</td>
+                                            <td>LANÇAMENTO AVISADO</td>
+                                            <td>60100</td>
+                                            <td>PARTIDO LIBERAL (PL)</td>
+                                            <td>08.517.423/0001-95</td>
+                                            <td>3.000,00</td>
+                                            <td>BCO BRASIL</td>
+                                            <td>452</td>
+                                            <td>530514</td>
+                                        </tr>
+                                        <tr>
+                                            <td>13/09/2024</td>
+                                            <td>CREDITO CFE. INSTRUCOES</td>
+                                            <td>LANÇAMENTO AVISADO</td>
+                                            <td>60101</td>
+                                            <td>PARTIDO LIBERAL (PL)</td>
+                                            <td>08.517.423/0001-95</td>
+                                            <td>9.000,00</td>
+                                            <td>BCO BRASIL</td>
+                                            <td>452</td>
+                                            <td>530514</td>
+                                        </tr>
+                                        <tr>
+                                            <td>18/09/2024</td>
+                                            <td>TRANSFERENCIA ENVIADA</td>
+                                            <td>TRANSFERÊNCIA ENTRE CONTAS</td>
+                                            <td>91801</td>
+                                            <td>Mega Vale Marketing Eventos e Prestacao de Servico</td>
+                                            <td>50.149.836/0001-20</td>
+                                            <td>5.500,00</td>
+                                            <td>CAIXA ECONOMICA FEDERAL</td>
+                                            <td>1817</td>
+                                            <td>22942</td>
+                                        </tr>
+                                        <tr>
+                                            <td>18/09/2024</td>
+                                            <td>TRANSFERENCIA ENVIADA</td>
+                                            <td>TRANSFERÊNCIA ENTRE CONTAS</td>
+                                            <td>91802</td>
+                                            <td>Mega Vale Marketing Eventos e Prestacao de Servico</td>
+                                            <td>50.149.836/0001-20</td>
+                                            <td>5.300,00</td>
+                                            <td>CAIXA ECONOMICA FEDERAL</td>
+                                            <td>1817</td>
+                                            <td>22942</td>
+                                        </tr>
+                                        <tr>
+                                            <td>27/09/2024</td>
+                                            <td>TRANSFERENCIA ENVIADA</td>
+                                            <td>TRANSFERÊNCIA ENTRE CONTAS</td>
+                                            <td>92701</td>
+                                            <td>Maria Inez da Silva Sousa 20993255884</td>
+                                            <td>321.307.480/0001-03</td>
+                                            <td>1.200,00</td>
+                                            <td></td>
+                                            <td>1</td>
+                                            <td>558828280</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="extrato-pdf" class="tab-content animated-element">
+                        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                            <h3 class="text-xl font-bold text-slate-100 mb-4">Extrato da Prestação de Contas - TRE</h3>
+                            <p class="text-slate-300 mb-4">Confira abaixo os principais dados financeiros do extrato oficial da prestação de contas fornecido pelo Tribunal Regional Eleitoral. Para visualizar o documento completo, clique no botão abaixo:</p>
+                            
+                            <div class="text-center my-6">
+                                <a href="https://issuu.com/sentinelanativense/docs/extrato_presta_o_contas_tre" target="_blank" class="inline-block bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition duration-300">
+                                    📄 Visualizar Extrato Completo no Issuu
+                                </a>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-slate-900 rounded-lg">
+                                <h4 class="text-lg font-bold text-slate-100 mb-3">Dados Financeiros do Extrato:</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-slate-800 p-3 rounded">
+                                        <p class="text-amber-400 font-bold text-lg">R$ 12.000,00</p>
+                                        <p class="text-slate-400 text-sm">Receitas (FEFC)</p>
+                                    </div>
+                                    <div class="bg-slate-800 p-3 rounded">
+                                        <p class="text-red-500 font-bold text-lg">R$ 0,00</p>
+                                        <p class="text-slate-400 text-sm">Despesas Declaradas</p>
+                                    </div>
+                                    <div class="bg-slate-800 p-3 rounded">
+                                        <p class="text-green-500 font-bold text-lg">R$ 12.000,00</p>
+                                        <p class="text-slate-400 text-sm">Saldo Financeiro Positivo</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 pt-4 border-t border-slate-700">
+                                    <h5 class="font-bold text-slate-200 mb-2">📌 Pontos Críticos Identificados:</h5>
+                                    <ul class="list-disc list-inside text-slate-300 space-y-1 text-sm">
+                                        <li>Candidato recebeu R$ 12.000,00 do Fundo Eleitoral (FEFC)</li>
+                                        <li>Nenhuma despesa foi declarada na prestação de contas</li>
+                                        <li>Saldo financeiro positivo de R$ 12.000,00 indica recursos não comprovados</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <p class="text-slate-400 mt-6 text-sm">
+                                <strong>Nota:</strong> O extrato completo pode ser acessado diretamente no site do Issuu através do botão acima. 
+                                O documento confirma a inconsistência entre os recursos recebidos e as despesas declaradas.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="conclusion" class="text-center bg-slate-800/50 border border-amber-500/30 py-16 rounded-lg animated-element">
+                <h2 class="text-4xl font-black text-slate-100 mb-4">Parecer Final da Investigação</h2>
+                <p class="text-slate-300 max-w-3xl mx-auto mb-8">
+                    A análise forense conclui que a prestação de contas de Everson Cristian da Silva é uma peça de ficção, projetada para ocultar o uso de R$ 12.000,00 em verba pública. A fraude é material, deliberada e agravada pelo uso de um fornecedor com todos os indícios de ser uma entidade de fachada, possivelmente ligada a um esquema de desvio de recursos.
+                </p>
+                <div class="border-t border-slate-700 max-w-lg mx-auto pt-6">
+                    <h4 class="text-xl font-bold mb-3 text-amber-400 font-mono">RECOMENDAÇÕES AO MINISTÉRIO PÚBLICO</h4>
+                    <ul class="text-slate-300 space-y-2 text-left">
+                        <li>1. Abertura de Ação de Investigação Judicial Eleitoral (AIJE).</li>
+                        <li>2. Quebra de sigilo bancário dos fornecedores para rastrear o dinheiro.</li>
+                        <li>3. Investigação dos sócios da MEGA VALE e seus vínculos com o candidato.</li>
+                        <li>4. Extração de peças para investigação criminal por peculato e falsidade ideológica.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const startBtn = document.getElementById('start-investigation-btn');
+            const splashScreen = document.getElementById('splash-screen');
+            const investigationInterface = document.getElementById('investigation-interface');
+            
+            startBtn.addEventListener('click', () => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                    investigationInterface.style.display = 'block';
+                    setTimeout(() => {
+                        investigationInterface.style.opacity = '1';
+                        animateCounters();
+                    }, 50);
+                }, 1000);
+            });
+
+            function animateCounters() {
+                const animateValue = (id, start, end, duration, isCurrency) => {
+                    const obj = document.getElementById(id);
+                    let startTimestamp = null;
+                    const step = (timestamp) => {
+                        if (!startTimestamp) startTimestamp = timestamp;
+                        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                        let currentValue = progress * (end - start) + start;
+                        if (isCurrency) {
+                            obj.innerHTML = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentValue);
+                        } else {
+                            obj.innerHTML = `R$ ${Math.floor(currentValue).toLocaleString('pt-BR')}`;
+                        }
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        }
+                    };
+                    window.requestAnimationFrame(step);
+                };
+                animateValue('kpi-recebido', 0, 12000, 1500, false);
+                animateValue('kpi-gasto', 0, 12000, 1500, false);
+                animateValue('kpi-declarado', 0, 0, 1500, true);
+            }
+
+            const animatedElements = document.querySelectorAll('.animated-element');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            animatedElements.forEach(el => observer.observe(el));
+
+            // Tabs
+            const tabButtons = document.querySelectorAll('.case-file-tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(button.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Accordion
+            const accordionData = [
+                { title: "Desaprovação das Contas (Art. 53, Res. TSE 23.607/19)", content: "A omissão de 100% das despesas impede a análise e leva à desaprovação total. A lei considera isso uma falha insanável." },
+                { title: "Devolução Integral ao Tesouro (Art. 60, Res. TSE 23.607/19)", content: "Por se tratar de verba pública (FEFC) aplicada sem comprovação fiscal idônea, o candidato será obrigado a devolver os R$ 12.000,00 aos cofres públicos." },
+                { title: "Inelegibilidade (Lei da Ficha Limpa)", content: "A desaprovação, dada a gravidade e a má-fé, pode resultar na declaração de inelegibilidade do candidato por 8 anos." },
+                { title: "Crime de Falsidade Ideológica (Art. 350, Cód. Eleitoral)", content: "Declarar informação falsa à Justiça Eleitoral é crime, com pena de até 5 anos de reclusão e multa." }
+            ];
+            const accordionContainer = document.getElementById('accordion-container');
+            accordionData.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'bg-slate-800 rounded-lg border border-slate-700 overflow-hidden';
+                const button = document.createElement('button');
+                button.className = 'w-full p-5 text-left font-bold text-slate-200 flex justify-between items-center hover:bg-slate-700/50 transition';
+                button.innerHTML = `<span>${item.title}</span><span class="text-amber-400 text-2xl transition-transform duration-300 transform">+</span>`;
+                const content = document.createElement('div');
+                content.className = 'max-h-0 overflow-hidden transition-all duration-500 ease-in-out';
+                content.innerHTML = `<div class="p-5 pt-0 text-slate-300">${item.content}</div>`;
+                itemDiv.appendChild(button);
+                itemDiv.appendChild(content);
+                accordionContainer.appendChild(itemDiv);
+                button.addEventListener('click', () => {
+                    const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+                    if (isOpen) {
+                        content.style.maxHeight = '0px';
+                        button.querySelector('span:last-child').style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        button.querySelector('span:last-child').style.transform = 'rotate(45deg)';
+                    }
+                });
+            });
+
+            // Navegação por menu
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // Atualizar link ativo ao rolar
+            window.addEventListener('scroll', () => {
+                let current = '';
+                const sections = document.querySelectorAll('section');
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+```
